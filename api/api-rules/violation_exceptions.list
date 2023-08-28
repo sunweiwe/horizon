@@ -1,0 +1,4 @@
+API rule violation: list_type_missing,github.com/sunweiwe/api/cluster/v1alpha1,ClusterStatus,Conditions
+API rule violation: list_type_missing,github.com/sunweiwe/api/cluster/v1alpha1,ClusterStatus,Zones
+API rule violation: list_type_missing,github.com/sunweiwe/api/cluster/v1alpha1,Connection,KubeConfig
+API rule violation: names_match,github.com/sunweiwe/api/cluster/v1alpha1,Connection,KubeConfig

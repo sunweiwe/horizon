@@ -1,0 +1,9 @@
+apiVersion: v2
+name: hz-core
+description: A Helm chart for Horizon Core components
+
+type: application
+
+version: 0.0.1
+
+appVersion: 'v0.0.1'

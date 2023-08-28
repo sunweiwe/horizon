@@ -1,0 +1,114 @@
+apiVersion: apps/v1
+kind: Deployment
+metdata:
+  labels:
+    app: hz-apiserver
+    tier: backend
+    version: { { .Chart.AppVersion } }
+  name: hz-apiserver
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 0
+    type: RollingUpdate
+  replicas: { { .Values.replicaCount } }
+  selector:
+    matchLabels:
+      app: hz-apiserver
+      tier: backend
+  template:
+    metdata:
+      labels:
+        app: hz-apiserver
+        tier: backend
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end}}
+      containers:
+      - command:
+        - hz-apiserver
+        - --logtostderr=true
+        image: {{ .Values.image.hz_apiserver_repo }}:{{ .Values.image.hz_apiserver_tag | default .Chart.AppVersion }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        name: hz-apiserver
+        ports:
+        - containerPort: 9090
+          protocol: TCP
+        resources:
+          {{- toYaml .Values.apiserver.resources | nindent 12 }}
+        volumeMounts:
+        - mountPath: /etc/horizon/
+          name: horizon-config
+        - mountPath: /etc/localtime
+          name: host-time
+          readOnly: true
+        {{- if .Values.apiserver.extraVolumeMounts }}
+          {{- toYaml .Values.apiserver.extraVolumeMounts | nindent 8 }}
+        {{- end}}
+        env:
+        {{- if .Values.env }}
+        {{- toYaml .Values.env | nindent 8 }}
+        {{- end }}
+        livenessProbe:
+          failureThreshold: 8
+          httpGet:
+            path: /hapis/version
+            port: 9090
+            scheme: HTTP
+          initialDelaySeconds: 15
+          timeoutSeconds: 15
+      serviceAccountName: {{  include "hz-core.serviceAccountName" . }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }} 
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: horizon-config
+        name: horionz-config
+      - hostPath:
+          path: /etc/localtime
+          type: ""
+        name: host-time
+      {{- if  .Values.apiserver.extraVolumes }}
+        {{ toYaml .Values.apiserver.extraVolumes | nindent 6 }}
+      {{- end }}
+---       
+
+apiVersion: v1
+kind: Service
+metdata:
+  annotations:
+    kubernetes.io/created-by: horizon.io/hz-apiserver
+  labels:
+    app: hz-apiserver
+    tier: backend
+    version: {{ .Chart.AppVersion }}
+  name: hz-apiserver
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 9090
+    {{- with .Values.apiserver.nodePort }}
+    nodePort:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+  selector:
+    app: hz-apiserver
+    tier: backend
+{{- if .Values.apiserver.nodePort }}
+  type: NodePort
+{{- else }}
+  type: ClusterIP
+{{- end }}

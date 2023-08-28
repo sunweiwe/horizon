@@ -1,0 +1,65 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Horizon OpenAPI",
+    "title": "Horizon",
+    "contact": {
+      "name": "Horizon",
+      "url": "https://horizon.io/",
+      "email": "sun_weiwe@163.com"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "v0.0.0-master+$Format:%H$",
+    "x-taggroups": [
+      {
+        "name": "Authentication",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    ]
+  },
+  "paths": {
+    "/hapis/cluster.horizon.io/v1alpha1/clusters/{cluster}/agent/deployment": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "Multi-cluster"
+        ],
+        "summary": "Return deployment yaml for cluster agent",
+        "operationId": "generateAgentDeployment",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Name of the cluster.",
+            "name": "cluster",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "jwt": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  },
+  "security": [
+    {
+      "jwt": []
+    }
+  ]
+}

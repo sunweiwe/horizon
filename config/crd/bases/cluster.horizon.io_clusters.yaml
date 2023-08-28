@@ -1,0 +1,128 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.11.3
+  creationTimestamp: null
+  name: clusters.cluster.horizon.io
+spec:
+  group: cluster.horizon.io
+  names:
+    kind: Cluster
+    listKind: ClusterList
+    plural: clusters
+    singular: cluster
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .spec.joinFederation
+      name: Federated
+      type: boolean
+    - jsonPath: .spec.provider
+      name: Provider
+      type: string
+    - jsonPath: .spec.enable
+      name: Active
+      type: boolean
+    - jsonPath: .status.kubernetesVersion
+      name: Version
+      type: string
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            properties:
+              connection:
+                properties:
+                  externalKubernetesAPIEndpoint:
+                    type: string
+                  horizonAPIEndpoint:
+                    type: string
+                  horizonAPIServerPort:
+                    type: integer
+                  kubeconfig:
+                    format: byte
+                    type: string
+                  kubernetesAPIEndpoint:
+                    type: string
+                  kubernetesAPIServerPort:
+                    type: integer
+                  token:
+                    type: string
+                  type:
+                    type: string
+                type: object
+              enable:
+                type: boolean
+              externalKubeAPIEnabled:
+                type: boolean
+              joinFederation:
+                type: boolean
+              provider:
+                type: string
+            type: object
+          status:
+            properties:
+              conditions:
+                items:
+                  properties:
+                    lastTransitionTime:
+                      format: date-time
+                      type: string
+                    lastUpdateTime:
+                      format: date-time
+                      type: string
+                    message:
+                      type: string
+                    reason:
+                      type: string
+                    status:
+                      type: string
+                    type:
+                      type: string
+                  required:
+                  - status
+                  - type
+                  type: object
+                type: array
+              configz:
+                additionalProperties:
+                  type: boolean
+                type: object
+              horizonVersion:
+                type: string
+              kubernetesVersion:
+                type: string
+              nodeCount:
+                type: integer
+              region:
+                type: string
+              uid:
+                description: UID is a type that holds unique ID values, including
+                  UUIDs.  Because we don't ONLY use UUIDs, this is an alias to string.  Being
+                  a type captures intent and helps make sure that UIDs and names do
+                  not get conflated.
+                type: string
+              zones:
+                items:
+                  type: string
+                type: array
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources: {}

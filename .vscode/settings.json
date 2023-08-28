@@ -1,0 +1,30 @@
+{
+  "cSpell.words": [
+    "apiextensions",
+    "apiextensionsv",
+    "apimachinery",
+    "apiserver",
+    "appsv",
+    "clientcmd",
+    "Clientset",
+    "clusterv",
+    "controllerconfig",
+    "Finalizer",
+    "Finalizers",
+    "fsnotify",
+    "GVRs",
+    "ictx",
+    "Infof",
+    "klog",
+    "Klogr",
+    "kubeconfig",
+    "leaderelection",
+    "mapstructure",
+    "metav",
+    "multicluster",
+    "pflag",
+    "Requeues",
+    "Warningf",
+    "workqueue"
+  ]
+}
