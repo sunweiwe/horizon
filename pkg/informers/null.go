@@ -6,7 +6,7 @@ import (
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes/fake"
 
-	fakeclientset "github.com/sunweiwe/horizon/pkg/client/clientset/versioned/fake"
+	fakeclientset "github.com/sunweiwe/horizon/pkg/client/clientset/fake"
 	horizoninformers "github.com/sunweiwe/horizon/pkg/client/informers"
 )
 

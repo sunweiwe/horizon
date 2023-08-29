@@ -4,9 +4,9 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/sunweiwe/horizon/pkg/client/clientset/versioned"
 	"k8s.io/client-go/kubernetes"
 
+	"github.com/sunweiwe/horizon/pkg/client/clientset"
 	horizonInformers "github.com/sunweiwe/horizon/pkg/client/informers"
 	kubeInformers "k8s.io/client-go/informers"
 )
@@ -40,7 +40,7 @@ func (f *informerFactories) Start(stopCh <-chan struct{}) {
 	}
 }
 
-func NewInformerFactories(client kubernetes.Interface, horizonClient versioned.Interface) InformerFactory {
+func NewInformerFactories(client kubernetes.Interface, horizonClient clientset.Interface) InformerFactory {
 	factory := &informerFactories{}
 
 	if client != nil {

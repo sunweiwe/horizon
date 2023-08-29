@@ -10,23 +10,25 @@ import (
 	"time"
 
 	clusterv1alpha1 "github.com/sunweiwe/api/cluster/v1alpha1"
-	"github.com/sunweiwe/horizon/pkg/apiserver/config"
-	horizon "github.com/sunweiwe/horizon/pkg/client/clientset/versioned"
+	horizon "github.com/sunweiwe/horizon/pkg/client/clientset"
 	clusterInformer "github.com/sunweiwe/horizon/pkg/client/informers/cluster/v1alpha1"
 	clusterLister "github.com/sunweiwe/horizon/pkg/client/listers/cluster/v1alpha1"
+	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	utilRuntime "k8s.io/apimachinery/pkg/util/runtime"
+	clientCmd "k8s.io/client-go/tools/clientcmd"
+
+	"github.com/sunweiwe/horizon/pkg/apiserver/config"
+	"github.com/sunweiwe/horizon/pkg/client/clientset/scheme"
 	"github.com/sunweiwe/horizon/pkg/constants"
 	"github.com/sunweiwe/horizon/pkg/simple/client/multicluster"
 	"github.com/sunweiwe/horizon/pkg/utils/k8sutil"
 	"gopkg.in/yaml.v2"
-	v1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	clientCmd "k8s.io/client-go/tools/clientcmd"
-
-	"github.com/sunweiwe/horizon/pkg/client/clientset/versioned/scheme"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
@@ -116,7 +118,17 @@ func NewClusterController(
 	c.clusterLister = clusterInformer.Lister()
 	c.clusterHasSynced = clusterInformer.Informer().HasSynced
 
-	clusterInformer.Informer().AddEventHandlerWithResyncPeriod(cache.ResourceEventHandlerFuncs{}, resyncPeriod)
+	clusterInformer.Informer().AddEventHandlerWithResyncPeriod(cache.ResourceEventHandlerFuncs{
+		AddFunc: c.enqueueCluster,
+		UpdateFunc: func(oldObj, newObj interface{}) {
+			oldCluster := oldObj.(*clusterv1alpha1.Cluster)
+			newCluster := newObj.(*clusterv1alpha1.Cluster)
+			if !reflect.DeepEqual(oldCluster.Spec, newCluster.Spec) || newCluster.DeletionTimestamp != nil {
+				c.enqueueCluster(newObj)
+			}
+		},
+		DeleteFunc: c.enqueueCluster,
+	}, resyncPeriod)
 
 	return c
 }
@@ -136,21 +148,21 @@ func (c *clusterController) Run(workers int, stopCh <-chan struct{}) error {
 		return fmt.Errorf("failed to wait for caches to sync")
 	}
 
-	// for i := 0; i < workers; i++ {
-	// 	go wait.Until(c.worker, c.workerLoopPeriod, stopCh)
-	// }
+	for i := 0; i < workers; i++ {
+		go wait.Until(c.worker, c.workerLoopPeriod, stopCh)
+	}
 
-	// go wait.Until(
-	// 	func() {
-	// 		if err := c.reconcileHostCluster(); err != nil {
-	// 			klog.Errorf("Error create host cluster, error %v", err)
-	// 		}
+	go wait.Until(
+		func() {
+			if err := c.reconcileHostCluster(); err != nil {
+				klog.Errorf("Error create host cluster, error %v", err)
+			}
 
-	// 		if err := c.resyncClusters(); err != nil {
-	// 			klog.Errorf("Failed to reconcile cluster ready status, err: %v", err)
-	// 		}
+			if err := c.resyncClusters(); err != nil {
+				klog.Errorf("Failed to reconcile cluster ready status, err: %v", err)
+			}
 
-	// 	}, c.resyncPeriod, stopCh)
+		}, c.resyncPeriod, stopCh)
 
 	<-stopCh
 
@@ -463,4 +475,16 @@ func parseKubeConfigExpirationDate(kubeconfig []byte) (time.Time, error) {
 		return time.Time{}, err
 	}
 	return cert.NotAfter, nil
+}
+
+func (c *clusterController) enqueueCluster(obj interface{}) {
+	cluster := obj.(*clusterv1alpha1.Cluster)
+
+	key, err := cache.MetaNamespaceKeyFunc(obj)
+	if err != nil {
+		utilRuntime.HandleError(fmt.Errorf("get cluster key %s failed", cluster.Name))
+		return
+	}
+
+	c.queue.Add(key)
 }

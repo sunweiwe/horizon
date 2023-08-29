@@ -1,9 +1,9 @@
-package versioned
+package clientset
 
 import (
 	"fmt"
 
-	clusterv1alpha1 "github.com/sunweiwe/horizon/pkg/client/clientset/versioned/typed/cluster/v1alpha1"
+	clusterv1alpha1 "github.com/sunweiwe/horizon/pkg/client/clientset/typed/cluster/v1alpha1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/util/flowcontrol"
 )

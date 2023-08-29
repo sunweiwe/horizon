@@ -2,7 +2,7 @@ package v1alpha1
 
 import (
 	"github.com/sunweiwe/api/cluster/v1alpha1"
-	"github.com/sunweiwe/horizon/pkg/client/clientset/versioned/scheme"
+	"github.com/sunweiwe/horizon/pkg/client/clientset/scheme"
 	"k8s.io/client-go/rest"
 )
 

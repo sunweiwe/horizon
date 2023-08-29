@@ -1,10 +1,9 @@
 package fake
 
 import (
+	"github.com/sunweiwe/horizon/pkg/client/clientset/typed/cluster/v1alpha1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/testing"
-
-	v1alpha1 "github.com/sunweiwe/horizon/pkg/client/clientset/versioned/typed/cluster/v1alpha1"
 )
 
 type FakeClusterV1alpha1 struct {

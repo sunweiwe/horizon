@@ -5,8 +5,8 @@ import (
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/testing"
 
-	clusterv1alpha1 "github.com/sunweiwe/horizon/pkg/client/clientset/versioned/typed/cluster/v1alpha1"
-	fakeclusterv1alpha1 "github.com/sunweiwe/horizon/pkg/client/clientset/versioned/typed/cluster/v1alpha1/fake"
+	clusterv1alpha1 "github.com/sunweiwe/horizon/pkg/client/clientset/typed/cluster/v1alpha1"
+	fakeclusterv1alpha1 "github.com/sunweiwe/horizon/pkg/client/clientset/typed/cluster/v1alpha1/fake"
 	fakediscovery "k8s.io/client-go/discovery/fake"
 )
 

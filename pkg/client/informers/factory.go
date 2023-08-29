@@ -5,13 +5,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/sunweiwe/horizon/pkg/client/clientset/versioned"
+	"github.com/sunweiwe/horizon/pkg/client/clientset"
 	"github.com/sunweiwe/horizon/pkg/client/informers/cluster"
 	"github.com/sunweiwe/horizon/pkg/client/informers/internal"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/tools/cache"
+	"k8s.io/klog/v2"
 )
 
 type SharedInformerFactory interface {
@@ -25,7 +26,7 @@ type SharedInformerFactory interface {
 type SharedInformerOption func(*sharedInformerFactory) *sharedInformerFactory
 
 type sharedInformerFactory struct {
-	client versioned.Interface
+	client clientset.Interface
 
 	namespace        string
 	tweakListOptions internal.TweakListOptionsFunc
@@ -62,7 +63,7 @@ func (s *sharedInformerFactory) InformerFor(obj runtime.Object, handler internal
 	return informer
 }
 
-func NewSharedInformerFactory(client versioned.Interface, defaultResync time.Duration) SharedInformerFactory {
+func NewSharedInformerFactory(client clientset.Interface, defaultResync time.Duration) SharedInformerFactory {
 	return NewSharedInformerFactoryWithOptions(client, defaultResync)
 }
 
@@ -72,13 +73,14 @@ func (s *sharedInformerFactory) Start(stopCh <-chan struct{}) {
 
 	for informerType, informer := range s.informers {
 		if !s.startedInformers[informerType] {
+			klog.V(0).Info("informer running for %s", informerType)
 			go informer.Run(stopCh)
 			s.startedInformers[informerType] = true
 		}
 	}
 }
 
-func NewSharedInformerFactoryWithOptions(client versioned.Interface, defaultResync time.Duration, options ...SharedInformerOption) SharedInformerFactory {
+func NewSharedInformerFactoryWithOptions(client clientset.Interface, defaultResync time.Duration, options ...SharedInformerOption) SharedInformerFactory {
 	f := &sharedInformerFactory{
 		client:           client,
 		namespace:        v1.NamespaceAll,
@@ -88,6 +90,7 @@ func NewSharedInformerFactoryWithOptions(client versioned.Interface, defaultResy
 		customResync:     make(map[reflect.Type]time.Duration),
 	}
 
+	//! TODO check options
 	for _, opt := range options {
 		f = opt(f)
 	}

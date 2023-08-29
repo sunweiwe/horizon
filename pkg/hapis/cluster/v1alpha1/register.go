@@ -12,7 +12,7 @@ import (
 	"k8s.io/client-go/informers"
 
 	restfulspec "github.com/emicklei/go-restful-openapi/v2"
-	horizon "github.com/sunweiwe/horizon/pkg/client/clientset/versioned"
+	horizon "github.com/sunweiwe/horizon/pkg/client/clientset"
 	horizonInformers "github.com/sunweiwe/horizon/pkg/client/informers"
 	clusterlister "github.com/sunweiwe/horizon/pkg/client/listers/cluster/v1alpha1"
 	v1 "k8s.io/client-go/listers/core/v1"

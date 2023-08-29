@@ -1,7 +1,7 @@
 package k8s
 
 import (
-	horizon "github.com/sunweiwe/horizon/pkg/client/clientset/versioned"
+	horizon "github.com/sunweiwe/horizon/pkg/client/clientset"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 )

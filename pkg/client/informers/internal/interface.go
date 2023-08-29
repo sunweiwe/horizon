@@ -3,13 +3,13 @@ package internal
 import (
 	"time"
 
-	"github.com/sunweiwe/horizon/pkg/client/clientset/versioned"
+	"github.com/sunweiwe/horizon/pkg/client/clientset"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/tools/cache"
 )
 
-type NewInformerFunc func(versioned.Interface, time.Duration) cache.SharedIndexInformer
+type NewInformerFunc func(clientset.Interface, time.Duration) cache.SharedIndexInformer
 
 type SharedInformerFactory interface {
 	Start(stopCh <-chan struct{})
