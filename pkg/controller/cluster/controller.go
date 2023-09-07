@@ -11,7 +11,7 @@ import (
 
 	clusterv1alpha1 "github.com/sunweiwe/api/cluster/v1alpha1"
 	horizon "github.com/sunweiwe/horizon/pkg/client/clientset"
-	clusterInformer "github.com/sunweiwe/horizon/pkg/client/informers/cluster/v1alpha1"
+	clusterInformer "github.com/sunweiwe/horizon/pkg/client/informers/externalversions/cluster/v1alpha1"
 	clusterLister "github.com/sunweiwe/horizon/pkg/client/listers/cluster/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

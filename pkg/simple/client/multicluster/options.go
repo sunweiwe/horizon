@@ -25,7 +25,7 @@ type Options struct {
 
 func NewOptions() *Options {
 	return &Options{
-		Enable:                        true,
+		Enable:                        false,
 		ProxyPublishAddress:           "",
 		ProxyPublishService:           "",
 		ClusterControllerResyncPeriod: DefaultResyncPeriod,

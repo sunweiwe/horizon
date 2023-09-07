@@ -5,11 +5,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/scheme"
 )
 
-// +k8s:openapi-gen=true
-// +kubebuilder:object:generate=true
-// +k8s:defaulter-gen=TypeMeta
-// +groupName=cluster.horizon.io
-
 var (
 	SchemeGroupVersion = schema.GroupVersion{Group: "cluster.horizon.io", Version: "v1alpha1"}
 

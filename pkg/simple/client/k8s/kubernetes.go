@@ -6,7 +6,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
-	horizon "github.com/sunweiwe/horizon/pkg/client/clientset"
+	"github.com/sunweiwe/horizon/pkg/client/clientset"
 	apiextensionsClient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	clientCmd "k8s.io/client-go/tools/clientcmd"
 )
@@ -14,12 +14,12 @@ import (
 type Client interface {
 	Config() *rest.Config
 	Kubernetes() kubernetes.Interface
-	Horizon() horizon.Interface
+	Horizon() clientset.Interface
 }
 
 type kubernetesClient struct {
-	kube kubernetes.Interface
-	hz   horizon.Interface
+	kube    kubernetes.Interface
+	horizon clientset.Interface
 
 	apiextensions apiextensionsClient.Interface
 
@@ -39,7 +39,7 @@ func NewKubernetesClientOrDie(options *KubernetesOptions) Client {
 
 	k := &kubernetesClient{
 		kube:          kubernetes.NewForConfigOrDie(config),
-		hz:            horizon.NewForConfigOrDie(config),
+		horizon:       clientset.NewForConfigOrDie(config),
 		apiextensions: apiextensionsClient.NewForConfigOrDie(config),
 		master:        config.Host,
 		config:        config,
@@ -71,7 +71,7 @@ func NewKubernetesClient(options *KubernetesOptions) (Client, error) {
 		return nil, err
 	}
 
-	k.hz, err = horizon.NewForConfig(config)
+	k.horizon, err = clientset.NewForConfig(config)
 	if err != nil {
 		return nil, err
 	}
@@ -95,6 +95,6 @@ func (k *kubernetesClient) Kubernetes() kubernetes.Interface {
 	return k.kube
 }
 
-func (k *kubernetesClient) Horizon() horizon.Interface {
-	return k.hz
+func (k *kubernetesClient) Horizon() clientset.Interface {
+	return k.horizon
 }

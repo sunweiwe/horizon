@@ -7,12 +7,12 @@ import (
 	"k8s.io/client-go/kubernetes/fake"
 
 	fakeclientset "github.com/sunweiwe/horizon/pkg/client/clientset/fake"
-	horizoninformers "github.com/sunweiwe/horizon/pkg/client/informers"
+	"github.com/sunweiwe/horizon/pkg/client/informers/externalversions"
 )
 
 type nullInformerFactory struct {
 	fakeK8sInformerFactory     informers.SharedInformerFactory
-	fakeHorizonInformerFactory horizoninformers.SharedInformerFactory
+	fakeHorizonInformerFactory externalversions.SharedInformerFactory
 }
 
 func NewNullInformerFactory() InformerFactory {
@@ -20,7 +20,7 @@ func NewNullInformerFactory() InformerFactory {
 	fakeInformerFactory := informers.NewSharedInformerFactory(fakeClient, time.Minute*10)
 
 	fakeHorizonClient := fakeclientset.NewSimpleClientset()
-	fakeHorizonInformerFactory := horizoninformers.NewSharedInformerFactory(fakeHorizonClient, time.Minute*10)
+	fakeHorizonInformerFactory := externalversions.NewSharedInformerFactory(fakeHorizonClient, time.Minute*10)
 
 	return &nullInformerFactory{
 		fakeK8sInformerFactory:     fakeInformerFactory,
@@ -32,7 +32,7 @@ func (n nullInformerFactory) KubernetesSharedInformerFactory() informers.SharedI
 	return n.fakeK8sInformerFactory
 }
 
-func (n nullInformerFactory) HorizonSharedInformerFactory() horizoninformers.SharedInformerFactory {
+func (n nullInformerFactory) HorizonSharedInformerFactory() externalversions.SharedInformerFactory {
 	return n.fakeHorizonInformerFactory
 }
 

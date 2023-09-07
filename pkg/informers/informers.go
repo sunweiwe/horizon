@@ -7,7 +7,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/sunweiwe/horizon/pkg/client/clientset"
-	horizonInformers "github.com/sunweiwe/horizon/pkg/client/informers"
+	"github.com/sunweiwe/horizon/pkg/client/informers/externalversions"
 	kubeInformers "k8s.io/client-go/informers"
 )
 
@@ -15,7 +15,7 @@ const defaultResync = 600 * time.Second
 
 type InformerFactory interface {
 	KubernetesSharedInformerFactory() kubeInformers.SharedInformerFactory
-	HorizonSharedInformerFactory() horizonInformers.SharedInformerFactory
+	HorizonSharedInformerFactory() externalversions.SharedInformerFactory
 
 	Start(stopCh <-chan struct{})
 }
@@ -27,7 +27,7 @@ type GenericInformerFactory interface {
 
 type informerFactories struct {
 	informerFactory        kubeInformers.SharedInformerFactory
-	horizonInformerFactory horizonInformers.SharedInformerFactory
+	horizonInformerFactory externalversions.SharedInformerFactory
 }
 
 func (f *informerFactories) Start(stopCh <-chan struct{}) {
@@ -48,7 +48,7 @@ func NewInformerFactories(client kubernetes.Interface, horizonClient clientset.I
 	}
 
 	if horizonClient != nil {
-		factory.horizonInformerFactory = horizonInformers.NewSharedInformerFactory(horizonClient, defaultResync)
+		factory.horizonInformerFactory = externalversions.NewSharedInformerFactory(horizonClient, defaultResync)
 	}
 
 	return factory
@@ -58,6 +58,6 @@ func (f *informerFactories) KubernetesSharedInformerFactory() kubeInformers.Shar
 	return f.informerFactory
 }
 
-func (f *informerFactories) HorizonSharedInformerFactory() horizonInformers.SharedInformerFactory {
+func (f *informerFactories) HorizonSharedInformerFactory() externalversions.SharedInformerFactory {
 	return f.horizonInformerFactory
 }

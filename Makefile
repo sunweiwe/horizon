@@ -4,8 +4,8 @@
 CRD_OPTIONS ?= "crd:allowDangerousTypes=true"
 
 # TODO
-GV="cluster:v1alpha1"
-MANIFESTS="cluster:v1alpha1"
+GV=" tenant:v1alpha1 cluster:v1alpha1"
+MANIFESTS="cluster/v1alpha1  tenant/..."
 
 # App Version
 APP_VERSION = v0.0.1
@@ -23,6 +23,8 @@ $(LOCALBIN):
 
 CONTROLLER_GEN ?= $(LOCALBIN)/controller-gen
 OPENAPI_GEN ?= ${LOCALBIN}/openapi-gen
+CLIENT_GEN ?= ${LOCALBIN}/client-gen
+LISTER_GEN ?= ${LOCALBIN}/lister-gen
 
 ## Tool Versions
 KUSTOMIZE_VERSION ?= v5.0.0
@@ -31,6 +33,7 @@ OPENAPI_TOOLS_VERSION ?= v0.11.3
 
 KUSTOMIZE_INSTALL_SCRIPT ?= "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
 
+### Command
 
 .PHONY: binary
 binary: | hz-apiserver hz-controller-manager; $(info $(M)...Build all of binary.) @ ## Build all of binary.
@@ -43,6 +46,9 @@ hz-apiserver: ;$(info $(M)...Begin to build hz-apiserver binary.) @ ## Build hz-
 fmt: ;$(info $(M)...Begin to run go fmt against code.)
 	gofmt -w ./pkg ./cmd ./tools ./api  ./staging 
 
+.PHONY: type
+type: | manifests generate   ;$(info $(M)...generate all type.) @
+
 .PHONY: manifests
 manifests: ;$(info $(M)...Begin to generate manifests e.g. CRD, RBAC etc..)
 	$(CONTROLLER_GEN) rbac:roleName=manager-role crd webhook paths="./..." output:crd:artifacts:config=config/crd/bases
@@ -51,22 +57,28 @@ manifests: ;$(info $(M)...Begin to generate manifests e.g. CRD, RBAC etc..)
 generate: ;$(info $(M)...Begin generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations...) 
 	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
 
-.PHONY: deepcopy
-deepcopy: ;$(info $(M)...Begin to deepcopy.) 
-	$(CONTROLLER_GEN) object:headerFile=./hack/boilerplate.go.txt paths=./staging/github.com/sunweiwe/api/...
-
 .PHONY: openapi
 openapi: ;$(info $(M)...Begin to openapi.)  @ ## Openapi.
 	${OPENAPI_GEN} -O openapi_generated -i github.com/sunweiwe/api/cluster/v1alpha1 -p github.com/sunweiwe/api/cluster/v1alpha1 -h ./hack/boilerplate.go.txt --report-filename ./api/api-rules/violation_exceptions.list  --output-base=staging/
 	go run ./tools/crd-doc-gen/main.go
 	go run ./tools/doc-gen/main.go
 
-#  Tool
+.PHONY: clientset
+clientset:  ;$(info $(M)...Begin to find or download controller-gen.)  @ ## Find or download controller-gen,download controller-gen if necessary.
+	./hack/generate_client.sh ${GV}
 
+#  Dev Tooling
 .PHONY: openapi-gen
 openapi-gen: ${OPENAPI_GEN}
 ${OPENAPI_GEN}: ${LOCALBIN}
 	GOBIN=$(LOCALBIN) go install k8s.io/kubernetes/kube-openapi/cmd/openapi-gen@latest
+
+.PHONY: client-gen
+client-gen: ${CLIENT_GEN}
+${CLIENT_GEN}: ${LOCALBIN}
+	GOBIN=$(LOCALBIN) go install k8s.io/code-generator/cmd/client-gen@latest
+	GOBIN=$(LOCALBIN) go install k8s.io/code-generator/cmd/lister-gen@latest
+	GOBIN=$(LOCALBIN) go install k8s.io/code-generator/cmd/informer-gen@latest
 
 .PHONY: controller-gen
 controller-gen: $(CONTROLLER_GEN) 

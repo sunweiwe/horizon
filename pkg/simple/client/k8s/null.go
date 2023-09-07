@@ -1,7 +1,7 @@
 package k8s
 
 import (
-	horizon "github.com/sunweiwe/horizon/pkg/client/clientset"
+	"github.com/sunweiwe/horizon/pkg/client/clientset"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 )
@@ -17,7 +17,7 @@ func (n nullClient) Kubernetes() kubernetes.Interface {
 	return nil
 }
 
-func (n nullClient) Horizon() horizon.Interface {
+func (n nullClient) Horizon() clientset.Interface {
 	return nil
 }
 

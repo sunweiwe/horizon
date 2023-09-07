@@ -20,6 +20,7 @@ func init() {
 	SchemeBuilder.Register(&Cluster{}, &ClusterList{})
 }
 
+// +genclient
 // +kubebuilder:object:root=true
 // +k8s:openapi-gen=true
 // +genclient:nonNamespaced
@@ -28,6 +29,7 @@ func init() {
 // +kubebuilder:printcolumn:name="Active",type="boolean",JSONPath=".spec.enable"
 // +kubebuilder:printcolumn:name="Version",type="string",JSONPath=".status.kubernetesVersion"
 // +kubebuilder:resource:scope=Cluster
+
 type Cluster struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
