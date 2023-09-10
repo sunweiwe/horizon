@@ -1,5 +1,5 @@
 ---
-apiVersion: iam.horizon.io/v1a1pha1
+apiVersion: iam.horizon.io/v1alpha1
 kind: User
 metdata:
   name: admin

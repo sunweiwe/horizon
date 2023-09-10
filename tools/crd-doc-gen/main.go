@@ -7,15 +7,18 @@ import (
 	"path/filepath"
 
 	clusterv1alpha1 "github.com/sunweiwe/api/cluster/v1alpha1"
-	"k8s.io/apimachinery/pkg/api/meta"
+	tenantInstaller "github.com/sunweiwe/api/tenant/installer"
+	tenantv1alpha1 "github.com/sunweiwe/api/tenant/v1alpha1"
+
 	urlruntime "k8s.io/apimachinery/pkg/util/runtime"
-	"k8s.io/kube-openapi/pkg/common"
-	"k8s.io/kube-openapi/pkg/validation/spec"
 
 	"github.com/sunweiwe/horizon/tools/lib"
+	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
+	"k8s.io/kube-openapi/pkg/common"
+	"k8s.io/kube-openapi/pkg/validation/spec"
 )
 
 var output string
@@ -31,6 +34,8 @@ func main() {
 		Codecs = serializer.NewCodecFactory(Scheme)
 	)
 
+	tenantInstaller.Installer(Scheme)
+
 	urlruntime.Must(clusterv1alpha1.AddToScheme(Scheme))
 	urlruntime.Must(Scheme.SetVersionPriority(clusterv1alpha1.SchemeGroupVersion))
 
@@ -43,6 +48,10 @@ func main() {
 	mapper.AddSpecific(clusterv1alpha1.SchemeGroupVersion.WithKind(clusterv1alpha1.ResourceKindCluster),
 		clusterv1alpha1.SchemeGroupVersion.WithResource(clusterv1alpha1.ResourcesPluralCluster),
 		clusterv1alpha1.SchemeGroupVersion.WithResource(clusterv1alpha1.ResourcesSingularCluster), meta.RESTScopeRoot)
+
+	mapper.AddSpecific(tenantv1alpha1.SchemeGroupVersion.WithKind(tenantv1alpha1.ResourceKindWorkspace),
+		tenantv1alpha1.SchemeGroupVersion.WithResource(tenantv1alpha1.ResourcePluralWorkspace),
+		tenantv1alpha1.SchemeGroupVersion.WithResource(tenantv1alpha1.ResourceSingularWorkspace), meta.RESTScopeRoot)
 
 	spec, err := lib.RenderOpenAPISpec(lib.Config{
 		Scheme: Scheme,
@@ -61,9 +70,11 @@ func main() {
 		},
 		OpenAPIDefinitions: []common.GetOpenAPIDefinitions{
 			clusterv1alpha1.GetOpenAPIDefinitions,
+			tenantv1alpha1.GetOpenAPIDefinitions,
 		},
 		Resources: []schema.GroupVersionResource{
 			clusterv1alpha1.SchemeGroupVersion.WithResource(clusterv1alpha1.ResourcesPluralCluster),
+			tenantv1alpha1.SchemeGroupVersion.WithResource(tenantv1alpha1.ResourcePluralWorkspace),
 		},
 		Mapper: mapper,
 	})

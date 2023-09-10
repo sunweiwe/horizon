@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"time"
 
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -14,12 +15,15 @@ import (
 	"k8s.io/apiserver/pkg/registry/rest"
 	"k8s.io/apiserver/pkg/server"
 	"k8s.io/apiserver/pkg/server/options"
+	"k8s.io/klog/v2"
 	"k8s.io/kube-openapi/pkg/builder"
 	"k8s.io/kube-openapi/pkg/common"
 	"k8s.io/kube-openapi/pkg/common/restfuladapter"
 	"k8s.io/kube-openapi/pkg/validation/spec"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/informers"
+	clientrest "k8s.io/client-go/rest"
 )
 
 type Config struct {
@@ -57,14 +61,20 @@ func RenderOpenAPISpec(cfg Config) (string, error) {
 	}
 
 	serverConfig := server.NewRecommendedConfig(cfg.Codecs)
+	serverConfig.ClientConfig = &clientrest.Config{}
+	serverConfig.SharedInformerFactory = informers.NewSharedInformerFactory(nil, time.Duration(time.Second))
 
 	if err := recommendedOptions.ApplyTo(serverConfig); err != nil {
 		log.Fatal(err)
 		return "", err
 	}
 
+	klog.V(0).Info("get openapi config")
+
 	serverConfig.OpenAPIConfig = server.DefaultOpenAPIConfig(cfg.GetOpenAPIDefinitions, openapi.NewDefinitionNamer(cfg.Scheme))
 	serverConfig.OpenAPIConfig.Info.InfoProps = cfg.Info
+	serverConfig.OpenAPIV3Config = server.DefaultOpenAPIV3Config(cfg.GetOpenAPIDefinitions, openapi.NewDefinitionNamer(cfg.Scheme))
+	serverConfig.OpenAPIV3Config.Info.InfoProps = cfg.Info
 
 	genericServer, err := serverConfig.Complete().New("stash-server", server.NewEmptyDelegate())
 	if err != nil {

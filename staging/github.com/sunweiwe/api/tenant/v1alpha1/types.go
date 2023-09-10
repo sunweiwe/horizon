@@ -8,6 +8,13 @@ func init() {
 	SchemeBuilder.Register(&Workspace{}, &WorkspaceList{})
 }
 
+const (
+	ResourceKindWorkspace     = "Workspace"
+	ResourceSingularWorkspace = "workspace"
+	ResourcePluralWorkspace   = "workspaces"
+	WorkspaceLabel            = "horizon.io/workspace"
+)
+
 // +genclient
 // +kubebuilder:object:root=true
 // +genclient:nonNamespaced

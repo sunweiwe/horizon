@@ -181,8 +181,8 @@ func (s *APIServer) waitForResourceSync(ctx context.Context) error {
 	}
 
 	hzGVRs := map[schema.GroupVersion][]string{
-		{Group: "cluster.horizon.io", Version: "v1alpha1"}:   {"clusters"},
-		{Group: "tenant.kubesphere.io", Version: "v1alpha1"}: {"workspaces"},
+		{Group: "cluster.horizon.io", Version: "v1alpha1"}: {"clusters"},
+		{Group: "tenant.horiozn.io", Version: "v1alpha1"}:  {"workspaces"},
 	}
 
 	if err := waitForCacheSync(
@@ -210,7 +210,6 @@ func waitForCacheSync(discoveryClient discovery.DiscoveryInterface,
 	sharedInformerFactory informers.GenericInformerFactory,
 	informerForResourceFunc informerForResourceFunc, GVRs map[schema.GroupVersion][]string, stopCh <-chan struct{}) error {
 	for groupVersion, resourceNames := range GVRs {
-		klog.V(0).Infof("waitForCacaheSync groupVersion: %s,resourceNames: %v", groupVersion.String(), resourceNames)
 		var apiResourceList *v1.APIResourceList
 		var err error
 		err = retry.OnError(retry.DefaultRetry, func(err error) bool {
@@ -229,8 +228,6 @@ func waitForCacheSync(discoveryClient discovery.DiscoveryInterface,
 
 		for _, resourceName := range resourceNames {
 			groupVersionResource := groupVersion.WithResource(resourceName)
-			klog.V(0).Infof("waitForCacaheSync groupVersionResource: %s", groupVersionResource.String())
-
 			if !isResourceExists(apiResourceList.APIResources, groupVersionResource) {
 				klog.Warningf("resource %s not exists in the cluster", groupVersionResource)
 			} else {
