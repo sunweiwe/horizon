@@ -8,4 +8,6 @@ const (
 	MultiClusterTag = "Multi-cluster"
 
 	AuthenticationTag = "Authentication"
+
+	UserResourceTag = "User's Resources"
 )

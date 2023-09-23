@@ -48,7 +48,7 @@ fmt: ;$(info $(M)...Begin to run go fmt against code.)
 
 .PHONY: types
 types: ;$(info $(M)....Begin to generate manifests e.g. CRD, RBAC etc..Begin generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations...) @
-	$(CONTROLLER_GEN) rbac:roleName=manager-role crd webhook paths="./..." output:crd:artifacts:config=config/crd/bases
+	$(CONTROLLER_GEN) rbac:roleName=manager-role crd webhook paths="./..." output:crd:artifacts:config=config/hz-core/crds
 	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
 
 .PHONY: openapi

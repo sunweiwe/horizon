@@ -23,5 +23,5 @@ data:
       enableKubeConfig: true
     defaultClusterName: {{ .Values.console.defaultClusterName }}
 kind: ConfigMap
-metdata:
+metadata:
   name: hz-console-config

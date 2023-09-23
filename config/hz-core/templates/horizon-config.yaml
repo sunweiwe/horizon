@@ -1,7 +1,7 @@
 {{- if .Values.config.create -}}
 apiVersion: v1
 kind: ConfigMap
-metdata:
+metadata:
   name: horizon-config
 data:
   horizon.yaml: |
@@ -16,7 +16,7 @@ data:
 {{- if .Values.config.authentication.oauthOptions }}
   {{- with .Values.config.authentication.oauthOptions }}
   oauthOptions:
-    {{- to toYaml . | nindent 8 }}
+    {{- toYaml . | nindent 8 }}
   {{- end }}
 {{- else if eq (default .Values.config.multicluster.clusterRole "none") "member" }}
   oauthOptions:

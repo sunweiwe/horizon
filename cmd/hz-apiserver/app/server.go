@@ -82,6 +82,7 @@ func Run(s *options.ServerRunOptions, configCh <-chan apiserverconfig.Config, ct
 }
 
 func run(s *options.ServerRunOptions, ctx context.Context) error {
+	klog.V(0).Info("Cmd Apiserver run")
 	apiserver, err := s.NewAPIServer(ctx.Done())
 	if err != nil {
 		return err

@@ -12,7 +12,6 @@ import (
 	"github.com/emicklei/go-restful/v3"
 	"github.com/sunweiwe/horizon/pkg/apiserver/filter"
 	"github.com/sunweiwe/horizon/pkg/apiserver/request"
-	"github.com/sunweiwe/horizon/pkg/hapis/cluster/v1alpha1"
 	"github.com/sunweiwe/horizon/pkg/informers"
 	"github.com/sunweiwe/horizon/pkg/models/resources/v1beta1"
 	"github.com/sunweiwe/horizon/pkg/server/healthz"
@@ -28,6 +27,8 @@ import (
 	"k8s.io/klog/v2"
 
 	apiserverconfig "github.com/sunweiwe/horizon/pkg/apiserver/config"
+	clusterv1alphal "github.com/sunweiwe/horizon/pkg/hapis/cluster/v1alpha1"
+	tenantv1alpha2 "github.com/sunweiwe/horizon/pkg/hapis/tenant/v1alpha2"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	urlruntime "k8s.io/apimachinery/pkg/util/runtime"
 	runtimecache "sigs.k8s.io/controller-runtime/pkg/cache"
@@ -59,6 +60,7 @@ type APIServer struct {
 }
 
 func (s *APIServer) PrepareRun(stopCh <-chan struct{}) error {
+	klog.V(0).Info("Apiserver PrepareRun")
 	s.container = restful.NewContainer()
 	s.container.Filter(logRequest)
 	s.container.Router(restful.CurlyRouter{})
@@ -98,6 +100,8 @@ func (s *APIServer) buildHandlerChain(stopCh <-chan struct{}) {
 }
 
 func (s *APIServer) Run(ctx context.Context) (err error) {
+	klog.V(0).Info("Apiserver Run")
+
 	err = s.waitForResourceSync(ctx)
 	if err != nil {
 		return err
@@ -122,8 +126,6 @@ func (s *APIServer) Run(ctx context.Context) (err error) {
 }
 
 func (s *APIServer) waitForResourceSync(ctx context.Context) error {
-	klog.V(0).Info("Start cache objects")
-
 	stopCh := ctx.Done()
 
 	k8sGVRs := map[schema.GroupVersion][]string{
@@ -209,6 +211,8 @@ type informerForResourceFunc func(resource schema.GroupVersionResource) (interfa
 func waitForCacheSync(discoveryClient discovery.DiscoveryInterface,
 	sharedInformerFactory informers.GenericInformerFactory,
 	informerForResourceFunc informerForResourceFunc, GVRs map[schema.GroupVersion][]string, stopCh <-chan struct{}) error {
+	klog.V(0).Info("Apiserver Start cache objects")
+
 	for groupVersion, resourceNames := range GVRs {
 		var apiResourceList *v1.APIResourceList
 		var err error
@@ -240,7 +244,7 @@ func waitForCacheSync(discoveryClient discovery.DiscoveryInterface,
 
 	sharedInformerFactory.Start(stopCh)
 	sharedInformerFactory.WaitForCacheSync(stopCh)
-	klog.V(0).Info("waitForCacaheSync Start successful")
+	klog.V(0).Info("Apiserver WaitForCacaheSync Start successful")
 	return nil
 }
 
@@ -295,7 +299,7 @@ func (s *APIServer) metricsAPI() {
 }
 
 func (s *APIServer) horizonAPIs(stopCh <-chan struct{}) {
-	urlruntime.Must(v1alpha1.AddToContainer(
+	urlruntime.Must(clusterv1alphal.AddToContainer(
 		s.container,
 		s.KubernetesClient.Horizon(),
 		s.InformerFactory.KubernetesSharedInformerFactory(),
@@ -303,6 +307,12 @@ func (s *APIServer) horizonAPIs(stopCh <-chan struct{}) {
 		s.Config.MultiClusterOptions.ProxyPublishService,
 		s.Config.MultiClusterOptions.ProxyPublishAddress,
 		s.Config.MultiClusterOptions.AgentImage))
+
+	urlruntime.Must(tenantv1alpha2.AddToContainer(
+		s.container,
+		s.InformerFactory,
+		s.KubernetesClient.Kubernetes(),
+		s.KubernetesClient.Horizon()))
 
 }
 

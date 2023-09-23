@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
-metdata:
+metadata:
   labels:
     app: hz-console
     tier: frontend
-    version: { { .Chart.AppVersion } }
+    version: {{ .Chart.AppVersion }}
   name: hz-console
 spec:
   strategy:
     rollingUpdate:
       maxSurge: 0
     type: RollingUpdate
-  replicas: { { .Values.replicaCount } }
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       app: hz-console
@@ -80,7 +80,7 @@ spec:
 
 apiVersion: v1
 kind: Service
-metdata:
+metadata:
   labels:
     app: hz-console
     tier: frontend

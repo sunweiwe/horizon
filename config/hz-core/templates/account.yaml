@@ -1,13 +1,13 @@
 ---
-apiVersion: iam.horizon.io/v1alpha1
+apiVersion: iam.horizon.io/v1alpha2
 kind: User
-metdata:
+metadata:
   name: admin
   annotations:
     iam.horizon.io/uninitialized: 'true'
     helm.sh/resource-policy: keep
 spec:
   email: admin@horizon.io
-  password: { { include "getOrDefaultPass" . | quote } }
-stats:
+  password: {{ include "getOrDefaultPass" . | quote }}
+status:
   state: Active

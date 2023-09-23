@@ -1,10 +1,11 @@
-#
+# Default values for hz-core.
 
 replicaCount: 1
 
 image:
+  hz_console_repo: sunweiwe/hz-consloe
 
-adminPassword: ''
+adminPassword: ""
 
 config:
   create: true
@@ -15,19 +16,21 @@ config:
           secret: horizon
           redirectURIs:
             - '*'
-  jwtSecret: ''
+  jwtSecret: ""
   multicluster: {}
   monitoring: {}
   notification: {}
 
 imagePullSecrets: []
-nameOverride: ''
-fullnameOverride: ''
+nameOverride: ""
+fullnameOverride: ""
 
 serviceAccount:
   create: true
+
   annotations: {}
-  name: 'horizon'
+
+  name: "horizon"
 
 podAnnotations: {}
 
@@ -35,7 +38,7 @@ podSecurityContext: {}
 
 securityContext: {}
 
-kube_version: 'v0.0.1'
+kube_version: "v0.0.1"
 
 env: []
 
@@ -70,7 +73,7 @@ apiserver:
 
 console:
   nodePort: 30880
-  defaultClusterName: 'default'
+  defaultClusterName: "default" 
   resources:
     limits:
       cpu: 1

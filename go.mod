@@ -115,6 +115,8 @@ require (
 )
 
 require (
+	github.com/emicklei/go-restful v2.16.0+incompatible
+	github.com/emicklei/go-restful-openapi v1.4.1
 	github.com/emicklei/go-restful-openapi/v2 v2.9.1
 	github.com/emicklei/go-restful/v3 v3.10.2
 	github.com/gogo/protobuf v1.3.2 // indirect

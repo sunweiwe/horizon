@@ -99,7 +99,7 @@ func (s *ServerRunOptions) NewAPIServer(stopCh <-chan struct{}) (*apiserver.APIS
 
 func (s *ServerRunOptions) Flags() (fss flag.NamedFlagSets) {
 	fs := fss.FlagSet("generic")
-	fs.BoolVar(&s.DebugMode, "debug", false, "Don't enable this if you don't know what it means.")
+	fs.BoolVar(&s.DebugMode, "debug", true, "Don't enable this if you don't know what it means.")
 
 	s.KubernetesOptions.AddFlags(fss.FlagSet("kubernetes"), s.KubernetesOptions)
 	s.MonitoringOptions.AddFlags(fss.FlagSet("monitoring"), s.MonitoringOptions)
