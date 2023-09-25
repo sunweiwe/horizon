@@ -21,6 +21,8 @@ import (
 	clientset "github.com/sunweiwe/horizon/pkg/client/clientset"
 	clusterv1alpha1 "github.com/sunweiwe/horizon/pkg/client/clientset/typed/cluster/v1alpha1"
 	fakeclusterv1alpha1 "github.com/sunweiwe/horizon/pkg/client/clientset/typed/cluster/v1alpha1/fake"
+	iamv1alpha2 "github.com/sunweiwe/horizon/pkg/client/clientset/typed/iam/v1alpha2"
+	fakeiamv1alpha2 "github.com/sunweiwe/horizon/pkg/client/clientset/typed/iam/v1alpha2/fake"
 	tenantv1alpha1 "github.com/sunweiwe/horizon/pkg/client/clientset/typed/tenant/v1alpha1"
 	faketenantv1alpha1 "github.com/sunweiwe/horizon/pkg/client/clientset/typed/tenant/v1alpha1/fake"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -83,6 +85,11 @@ var (
 // ClusterV1alpha1 retrieves the ClusterV1alpha1Client
 func (c *Clientset) ClusterV1alpha1() clusterv1alpha1.ClusterV1alpha1Interface {
 	return &fakeclusterv1alpha1.FakeClusterV1alpha1{Fake: &c.Fake}
+}
+
+// IamV1alpha2 retrieves the IamV1alpha2Client
+func (c *Clientset) IamV1alpha2() iamv1alpha2.IamV1alpha2Interface {
+	return &fakeiamv1alpha2.FakeIamV1alpha2{Fake: &c.Fake}
 }
 
 // TenantV1alpha1 retrieves the TenantV1alpha1Client

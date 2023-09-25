@@ -22,6 +22,7 @@ import (
 	"net/http"
 
 	clusterv1alpha1 "github.com/sunweiwe/horizon/pkg/client/clientset/typed/cluster/v1alpha1"
+	iamv1alpha2 "github.com/sunweiwe/horizon/pkg/client/clientset/typed/iam/v1alpha2"
 	tenantv1alpha1 "github.com/sunweiwe/horizon/pkg/client/clientset/typed/tenant/v1alpha1"
 	discovery "k8s.io/client-go/discovery"
 	rest "k8s.io/client-go/rest"
@@ -31,6 +32,7 @@ import (
 type Interface interface {
 	Discovery() discovery.DiscoveryInterface
 	ClusterV1alpha1() clusterv1alpha1.ClusterV1alpha1Interface
+	IamV1alpha2() iamv1alpha2.IamV1alpha2Interface
 	TenantV1alpha1() tenantv1alpha1.TenantV1alpha1Interface
 }
 
@@ -38,12 +40,18 @@ type Interface interface {
 type Clientset struct {
 	*discovery.DiscoveryClient
 	clusterV1alpha1 *clusterv1alpha1.ClusterV1alpha1Client
+	iamV1alpha2     *iamv1alpha2.IamV1alpha2Client
 	tenantV1alpha1  *tenantv1alpha1.TenantV1alpha1Client
 }
 
 // ClusterV1alpha1 retrieves the ClusterV1alpha1Client
 func (c *Clientset) ClusterV1alpha1() clusterv1alpha1.ClusterV1alpha1Interface {
 	return c.clusterV1alpha1
+}
+
+// IamV1alpha2 retrieves the IamV1alpha2Client
+func (c *Clientset) IamV1alpha2() iamv1alpha2.IamV1alpha2Interface {
+	return c.iamV1alpha2
 }
 
 // TenantV1alpha1 retrieves the TenantV1alpha1Client
@@ -99,6 +107,10 @@ func NewForConfigAndClient(c *rest.Config, httpClient *http.Client) (*Clientset,
 	if err != nil {
 		return nil, err
 	}
+	cs.iamV1alpha2, err = iamv1alpha2.NewForConfigAndClient(&configShallowCopy, httpClient)
+	if err != nil {
+		return nil, err
+	}
 	cs.tenantV1alpha1, err = tenantv1alpha1.NewForConfigAndClient(&configShallowCopy, httpClient)
 	if err != nil {
 		return nil, err
@@ -125,6 +137,7 @@ func NewForConfigOrDie(c *rest.Config) *Clientset {
 func New(c rest.Interface) *Clientset {
 	var cs Clientset
 	cs.clusterV1alpha1 = clusterv1alpha1.New(c)
+	cs.iamV1alpha2 = iamv1alpha2.New(c)
 	cs.tenantV1alpha1 = tenantv1alpha1.New(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClient(c)

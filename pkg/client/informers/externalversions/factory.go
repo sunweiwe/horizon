@@ -24,6 +24,7 @@ import (
 
 	clientset "github.com/sunweiwe/horizon/pkg/client/clientset"
 	cluster "github.com/sunweiwe/horizon/pkg/client/informers/externalversions/cluster"
+	iam "github.com/sunweiwe/horizon/pkg/client/informers/externalversions/iam"
 	internalinterfaces "github.com/sunweiwe/horizon/pkg/client/informers/externalversions/internalinterfaces"
 	tenant "github.com/sunweiwe/horizon/pkg/client/informers/externalversions/tenant"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -244,11 +245,16 @@ type SharedInformerFactory interface {
 	InformerFor(obj runtime.Object, newFunc internalinterfaces.NewInformerFunc) cache.SharedIndexInformer
 
 	Cluster() cluster.Interface
+	Iam() iam.Interface
 	Tenant() tenant.Interface
 }
 
 func (f *sharedInformerFactory) Cluster() cluster.Interface {
 	return cluster.New(f, f.namespace, f.tweakListOptions)
+}
+
+func (f *sharedInformerFactory) Iam() iam.Interface {
+	return iam.New(f, f.namespace, f.tweakListOptions)
 }
 
 func (f *sharedInformerFactory) Tenant() tenant.Interface {

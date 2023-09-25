@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	v1alpha1 "github.com/sunweiwe/api/cluster/v1alpha1"
+	v1alpha2 "github.com/sunweiwe/api/iam/v1alpha2"
 	tenantv1alpha1 "github.com/sunweiwe/api/tenant/v1alpha1"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	cache "k8s.io/client-go/tools/cache"
@@ -55,6 +56,10 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 	// Group=cluster.horizon.io, Version=v1alpha1
 	case v1alpha1.SchemeGroupVersion.WithResource("clusters"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Cluster().V1alpha1().Clusters().Informer()}, nil
+
+		// Group=iam.horizon.io, Version=v1alpha2
+	case v1alpha2.SchemeGroupVersion.WithResource("users"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Iam().V1alpha2().Users().Informer()}, nil
 
 		// Group=tenant.horizon.io, Version=v1alpha1
 	case tenantv1alpha1.SchemeGroupVersion.WithResource("workspaces"):

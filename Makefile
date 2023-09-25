@@ -4,8 +4,8 @@
 CRD_OPTIONS ?= "crd:allowDangerousTypes=true"
 
 # TODO
-GV=" tenant:v1alpha1 cluster:v1alpha1"
-MANIFESTS="cluster/v1alpha1  tenant/..."
+GV=" tenant:v1alpha1 cluster:v1alpha1 iam:v1alpha2"
+MANIFESTS="cluster/v1alpha1 iam:v1alpha2 tenant/..."
 
 # App Version
 APP_VERSION = v0.0.1
