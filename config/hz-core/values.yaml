@@ -15,7 +15,7 @@ config:
         - name: horizon
           secret: horizon
           redirectURIs:
-            - '*'
+            - "*"
   jwtSecret: ""
   multicluster: {}
   monitoring: {}
@@ -73,7 +73,7 @@ apiserver:
 
 console:
   nodePort: 30880
-  defaultClusterName: "default" 
+  defaultClusterName: "default"
   resources:
     limits:
       cpu: 1

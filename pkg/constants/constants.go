@@ -10,4 +10,6 @@ const (
 	AuthenticationTag = "Authentication"
 
 	UserResourceTag = "User's Resources"
+
+	UserTag = "User"
 )

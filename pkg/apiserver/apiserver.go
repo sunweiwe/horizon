@@ -10,9 +10,13 @@ import (
 	"time"
 
 	"github.com/emicklei/go-restful/v3"
+	"github.com/sunweiwe/horizon/pkg/apiserver/authorization/rbac"
 	"github.com/sunweiwe/horizon/pkg/apiserver/filter"
 	"github.com/sunweiwe/horizon/pkg/apiserver/request"
 	"github.com/sunweiwe/horizon/pkg/informers"
+	"github.com/sunweiwe/horizon/pkg/models/iam/am"
+	"github.com/sunweiwe/horizon/pkg/models/iam/im"
+	"github.com/sunweiwe/horizon/pkg/models/resources/user"
 	"github.com/sunweiwe/horizon/pkg/models/resources/v1beta1"
 	"github.com/sunweiwe/horizon/pkg/server/healthz"
 	"github.com/sunweiwe/horizon/pkg/simple/client/k8s"
@@ -28,7 +32,9 @@ import (
 
 	apiserverconfig "github.com/sunweiwe/horizon/pkg/apiserver/config"
 	clusterv1alphal "github.com/sunweiwe/horizon/pkg/hapis/cluster/v1alpha1"
+	iamv1alpha2 "github.com/sunweiwe/horizon/pkg/hapis/iam/v1alpha2"
 	tenantv1alpha2 "github.com/sunweiwe/horizon/pkg/hapis/tenant/v1alpha2"
+
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	urlruntime "k8s.io/apimachinery/pkg/util/runtime"
 	runtimecache "sigs.k8s.io/controller-runtime/pkg/cache"
@@ -299,6 +305,13 @@ func (s *APIServer) metricsAPI() {
 }
 
 func (s *APIServer) horizonAPIs(stopCh <-chan struct{}) {
+	imOperator := im.NewOperator(
+		user.New(s.InformerFactory.KubernetesSharedInformerFactory(), s.InformerFactory.HorizonSharedInformerFactory()),
+	)
+
+	amOperator := am.NewOperator(s.KubernetesClient.Kubernetes(), s.KubernetesClient.Horizon(), s.InformerFactory)
+	rbacAuthorizer := rbac.NewRBACAuthorizer(amOperator)
+
 	urlruntime.Must(clusterv1alphal.AddToContainer(
 		s.container,
 		s.KubernetesClient.Horizon(),
@@ -313,6 +326,11 @@ func (s *APIServer) horizonAPIs(stopCh <-chan struct{}) {
 		s.InformerFactory,
 		s.KubernetesClient.Kubernetes(),
 		s.KubernetesClient.Horizon()))
+
+	urlruntime.Must(iamv1alpha2.AddToContainer(
+		s.container,
+		rbacAuthorizer,
+		imOperator))
 
 }
 

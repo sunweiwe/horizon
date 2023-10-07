@@ -5,6 +5,7 @@ import (
 	"github.com/sunweiwe/horizon/pkg/apiserver/query"
 	"k8s.io/klog"
 
+	iamv1alpha2 "github.com/sunweiwe/api/iam/v1alpha2"
 	resources "github.com/sunweiwe/horizon/pkg/models/resources/v1alpha3"
 )
 
@@ -29,5 +30,19 @@ func (im *imOperator) ListUsers(query *query.Query) (ret *api.ListResult, err er
 		return nil, err
 	}
 
-	return
+	data := make([]interface{}, 0)
+	for _, item := range ret.Items {
+		user := item.(*iamv1alpha2.User)
+		out := ensurePasswordNotOutput(user)
+		data = append(data, out)
+	}
+
+	ret.Items = data
+	return ret, nil
+}
+
+func ensurePasswordNotOutput(user *iamv1alpha2.User) *iamv1alpha2.User {
+	out := user.DeepCopy()
+	out.Spec.EncryptedPassword = ""
+	return out
 }

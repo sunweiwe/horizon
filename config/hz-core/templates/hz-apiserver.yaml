@@ -17,7 +17,7 @@ spec:
       app: hz-apiserver
       tier: backend
   template:
-    metdata:
+    metadata:
       labels:
         app: hz-apiserver
         tier: backend

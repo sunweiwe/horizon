@@ -1,5 +1,6 @@
 {
   "cSpell.words": [
+    "alphal",
     "apiextensions",
     "apiextensionsv",
     "apimachinery",
@@ -14,6 +15,7 @@
     "fsnotify",
     "genclient",
     "GVRs",
+    "iamv",
     "ictx",
     "Infof",
     "klog",
@@ -28,6 +30,11 @@
     "pflag",
     "printcolumn",
     "Requeues",
+    "resourcev",
+    "restfulspec",
+    "tenantv",
+    "urlruntime",
+    "utilerrors",
     "Warningf",
     "workqueue"
   ]
